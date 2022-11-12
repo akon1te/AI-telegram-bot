@@ -1,8 +1,10 @@
 #Jetbrains file
 .idea
+.fleet
 
-#Configs
-
+#Bot configs and other additional files
+config.py
+*_exmpl.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
