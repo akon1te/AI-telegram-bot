@@ -1,19 +1,13 @@
 import logging
+import os
 
 from telegram import *
 from telegram.ext import *
 
-from Bot.config import API_TOKEN
+from utils.config import API_TOKEN
+
 from Bot.file_processor_exmpl import process_file_command, send_botfather_command
-from Bot.texts import (
-    command_tutorial_text,
-    file_text,
-    get_keyboard_text_handler,
-    get_start_text,
-    help_text,
-    inline_text,
-    keyboard_text,
-)
+from Bot.texts import *
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -21,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start_command(update: Update, _: CallbackContext) -> None:
+def start_command(update: Update, context: CallbackContext) -> None:
     """Start command from handler"""
 
     name = update.message.from_user.first_name
@@ -36,10 +30,28 @@ def help_command(update: Update, _: CallbackContext) -> None:
     update.message.reply_text(help_text)
 
 
-def message_processing(update: Update, _: CallbackContext) -> None: 
+def message_processing(update: Update, context: CallbackContext) -> None: 
     """Poccessing of users'message from keyboard"""
 
-    #TODO: design and code this way of interacting with user
+    user_message = update.message.text
+    
+    #TODO: design and implement smart way of interacting with user
+    
+    context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text="INSERT BOT ANSWER HERE")
+    
+
+def  image_processing(update: Update, contest: CallbackContext) -> None:
+    """Preproccessing and downloading user's photos"""
+    
+    #TODO: implement files downloading func
+    
+    try:
+        file = update.message.photo
+        
+    except AttributeError:
+        pass
 
 
 def main() -> None:
@@ -52,8 +64,8 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('help', help_command))
 
     dispatcher.add_handler(MessageHandler(Filters.text, message_processing))
-    
-    dispatcher.add_error_handler()
+    dispatcher.add_handler(MessageHandler(Filters.Document.Category('image/'), image_processing))
+    #dispatcher.add_error_handler()
     
     updater.start_polling()
     updater.idle()
