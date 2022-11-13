@@ -40,15 +40,18 @@ def message_processing(update: Update, context: CallbackContext) -> None:
     context.bot.send_message(
         chat_id=update.message.chat_id,
         text="INSERT BOT ANSWER HERE")
-    
+        
 
-def  image_processing(update: Update, contest: CallbackContext) -> None:
+def  image_processing(update: Update, context: CallbackContext) -> None:
     """Preproccessing and downloading user's photos"""
-    
-    #TODO: implement files downloading func
-    
+
     try:
-        file = update.message.photo
+        file_id = update.message.photo[-1]
+        newFile = context.bot.getFile(file_id)
+        newFile.download(custom_path=f"temporaryfiles/{update.message.from_user.first_name}'s_image.jpg")
+        context.bot.sendMessage(
+            chat_id=update.message.chat_id, 
+            text="I get it successful!")
         
     except AttributeError:
         pass
@@ -64,7 +67,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('help', help_command))
 
     dispatcher.add_handler(MessageHandler(Filters.text, message_processing))
-    dispatcher.add_handler(MessageHandler(Filters.Document.Category('image/'), image_processing))
+    dispatcher.add_handler(MessageHandler(Filters.photo, image_processing))
     #dispatcher.add_error_handler()
     
     updater.start_polling()

@@ -1,6 +1,7 @@
-#Jetbrains file
+#IDE file
 .idea
 .fleet
+.vscode
 
 #Bot configs and other additional files
 config.py
