@@ -1,13 +1,21 @@
 import logging
 import os
-import random
 
-from telegram import *
-from telegram.ext import *
+from telegram import (
+    ReplyKeyboardRemove,
+    Update,
+)
+from telegram.ext import (
+    CallbackContext,
+    CommandHandler,
+    Dispatcher,
+    Filters,
+    MessageHandler,
+    Updater,
+)
 
 from utils.config import API_TOKEN
 
-from Bot.file_processor_exmpl import process_file_command, send_botfather_command
 from Bot.texts import *
 
 logging.basicConfig(
@@ -23,12 +31,12 @@ class BotHandler:
     def start_command(self, update: Update, context: CallbackContext) -> None:
         """Start command from handler"""
 
-        #TODO: think about unique identifires
         name = update.message.from_user.first_name
         if not name:
             name = 'User'
         
-        self.__users_files[update.message.from_user.id] = []
+        self.__users_files[update.message.from_user.id] = {}
+        self.__users_files[update.message.from_user.id]['full_name'] = update.message.from_user.full_name
                 
         update.message.reply_text(get_start_text(name), reply_markup=ReplyKeyboardRemove())
 
@@ -45,8 +53,8 @@ class BotHandler:
         directory = 'temporaryfiles'
 
         if update.message.from_user.id in self.__users_files.keys():
-            for filename in self.__users_files[update.message.from_user.id]:
-                cur_file = os.path.join(directory, filename+'.jpg')
+            for filename in self.__users_files[update.message.from_user.id]['images']:
+                cur_file = os.path.join(directory, filename + '.jpg')
                 os.remove(cur_file)
             del self.__users_files[update.message.from_user.id]
                 
@@ -71,9 +79,9 @@ class BotHandler:
         try:
             file_id = update.message.photo[-1]
             newFile = context.bot.getFile(file_id)
-            file_name = f"{update.message.from_user.id}_{len(self.__users_files[update.message.from_user.id])}"
+            file_name = f"{update.message.from_user.id}_{len(self.__users_files[update.message.from_user.id]['images'])}"
             
-            self.__users_files[update.message.from_user.id].append(file_name)
+            self.__users_files[update.message.from_user.id]['images'].append(file_name)
     
             newFile.download(
                 custom_path=f"temporaryfiles/{file_name}.jpg")
