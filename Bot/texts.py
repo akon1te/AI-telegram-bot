@@ -6,7 +6,6 @@ help_text = (
     f"Write me something and I will try to answer your question or complete your task"
 )
 
-
 end_text = (
     f"Goodbye!)"
 )

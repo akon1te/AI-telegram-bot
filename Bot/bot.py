@@ -7,14 +7,14 @@ from telegram import (
 )
 from telegram.ext import (
     CallbackContext,
+    filters,
+    Application,
     CommandHandler,
-    Dispatcher,
-    Filters,
     MessageHandler,
     Updater,
 )
 
-from utils.config import API_TOKEN
+API_TOKEN = '5467893531:AAGtHVvPbMEuT6fOVUuSjZeGT7AzV8QWWes'
 
 from Bot.texts import *
 
@@ -67,7 +67,7 @@ class BotHandler:
         user_message = update.message.text
         
         #TODO: design and implement smart way of interacting with user
-        
+
         context.bot.send_message(
             chat_id=update.message.chat_id,
             text="INSERT BOT ANSWER HERE")
@@ -97,20 +97,18 @@ class BotHandler:
 
 def main() -> None:
 
-    updater = Updater(API_TOKEN)
-    dispatcher: Dispatcher = updater.dispatcher
+    app  = Application.builder().token(API_TOKEN).build()
     Bot = BotHandler()
     # handlers
-    dispatcher.add_handler(CommandHandler('start', Bot.start_command))
-    dispatcher.add_handler(CommandHandler('help', Bot.help_command))
-    dispatcher.add_handler(CommandHandler('quit', Bot.end_command))
+    app.add_handler(CommandHandler('start', Bot.start_command))
+    app.add_handler(CommandHandler('help', Bot.help_command))
+    app.add_handler(CommandHandler('quit', Bot.end_command))
 
-    dispatcher.add_handler(MessageHandler(Filters.text, Bot.message_processing))
-    dispatcher.add_handler(MessageHandler(Filters.photo, Bot.image_processing))
+    app.add_handler(MessageHandler(filters.TEXT, Bot.message_processing))
+    app.add_handler(MessageHandler(filters.PHOTO, Bot.image_processing))
     #dispatcher.add_error_handler()
     
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 
 if __name__ == '__main__':
