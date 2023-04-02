@@ -16,7 +16,7 @@ from telegram.ext import (
     Updater,
 )
 
-PATH = Path('/mnt/d/MyCode/AI-telegram-bot')
+PATH = Path('C:/Codes/AI-telegram-bot/')
 
 API_TOKEN = '5467893531:AAGtHVvPbMEuT6fOVUuSjZeGT7AzV8QWWes'
 
