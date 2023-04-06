@@ -15,12 +15,13 @@ from telegram.ext import (
     MessageHandler,
     Updater,
 )
+from AI_Backend.Diffusers.diffuser_model import generate_picture
 
-PATH = Path('C:/Codes/AI-telegram-bot/')
+PATH = Path('C:/Codes/ai-telegram-bot/')
 
 API_TOKEN = '5467893531:AAGtHVvPbMEuT6fOVUuSjZeGT7AzV8QWWes'
 
-from texts import *
+from utils.texts import *
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -45,6 +46,20 @@ class BotHandler:
                 
         await update.message.reply_text(get_start_text(name), reply_markup=ReplyKeyboardRemove())
 
+    async def create_picture(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        
+        if len(self.__users_files[update.message.from_user.id]['images']) == 0:
+            await update.message.reply_text(no_pics)
+        else:
+            await update.message.reply_text("Pls wait, I'm not so fast, right now(")
+            picture_path = PATH / 'Data' / 'generated_files'
+            if not os.path.exists(picture_path):
+                os.makedirs(picture_path)
+                
+            pic = self.__users_files[update.message.from_user.id]['images'][-1]
+            save_path = generate_picture(pic_path = PATH / 'Data' / 'temporary_files' / pic, 
+                                         save_path=picture_path, user_id = update.message.from_user.id)
+            await update.message.reply_photo(save_path)
 
     def help_command(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         """Help command from handler"""
@@ -83,7 +98,7 @@ class BotHandler:
         
         try:
             file_name = f"{update.message.from_user.id}_{len(self.__users_files[update.message.from_user.id]['images'])}"
-            self.__users_files[update.message.from_user.id]['images'].append(file_name)
+            self.__users_files[update.message.from_user.id]['images'].append(f"{file_name}.jpg")
             path = PATH / 'Data' / 'temporaryfiles' / f'{file_name}.jpg'
             
             file_id = update.message.photo[-1].file_id
@@ -105,6 +120,7 @@ def main() -> None:
     Bot = BotHandler()
     # handlers
     app.add_handler(CommandHandler('start', Bot.start_command))
+    app.add_handler(CommandHandler('create', Bot.create_picture))
     app.add_handler(CommandHandler('help', Bot.help_command))
     app.add_handler(CommandHandler('quit', Bot.end_command))
 
