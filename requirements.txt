@@ -1,0 +1,5 @@
+diffusers==0.14.0
+Pillow==9.5.0
+python_telegram_bot==20.2
+telegram==0.0.1
+
