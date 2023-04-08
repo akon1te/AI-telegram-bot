@@ -6,7 +6,9 @@
 #Bot configs and other additional files
 config.py
 *_exmpl.py
-temporaryfiles
+temporary_files
+generated_files
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
