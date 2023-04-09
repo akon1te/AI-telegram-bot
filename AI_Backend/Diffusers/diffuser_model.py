@@ -1,33 +1,12 @@
 from diffusers import StableDiffusionImageVariationPipeline, StableDiffusionPipeline
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 from PIL import Image
+import librosa
 import torch
 from torchvision import transforms
 
-"""
-def sound_preproccessing():
 
-    # load model and processor
-    processor = WhisperProcessor.from_pretrained("openai/whisper-base")
-    model = WhisperForConditionalGeneration.from_pretrained(
-        "openai/whisper-base")
-    forced_decoder_ids = processor.get_decoder_prompt_ids(
-        language="russian", task="translate")
-
-    # load streaming dataset and read first audio sample
-    input_speech = 0
-    input_features = processor(
-        input_speech["array"], sampling_rate=input_speech["sampling_rate"], return_tensors="pt").input_features
-
-    # generate token ids
-    predicted_ids = model.generate(
-        input_features, forced_decoder_ids=forced_decoder_ids)
-    # decode token ids to text
-    transcription = processor.batch_decode(
-        predicted_ids, skip_special_tokens=True)
-"""
-
-def sd_create_from_text(text: str, save_path: str, user_id):
+def sd_create_from_text(text: str, save_path: str, user_id) -> str:
 
     sd_pipeline = StableDiffusionPipeline.from_pretrained(
         "runwayml/stable-diffusion-v1-5", torch_dtype=torch.float16)
@@ -36,6 +15,28 @@ def sd_create_from_text(text: str, save_path: str, user_id):
     out = sd_pipeline(text)
     out['images'][0].save(f"{save_path}/{user_id}_result.jpg")
     return f"{save_path}/{user_id}_result.jpg"
+
+
+def sound_preproccessing(sound_path: str, save_path: str, user_id) -> str:
+
+    processor = Wav2Vec2Processor.from_pretrained(
+        'jonatasgrosman/wav2vec2-large-xlsr-53-english')
+    model = Wav2Vec2ForCTC.from_pretrained(
+        'jonatasgrosman/wav2vec2-large-xlsr-53-english')
+
+    speech_array, sampling_rate = librosa.load(sound_path, sr=16_000)
+    inputs = processor(speech_array, sampling_rate=16_000,
+                       return_tensors="pt", padding=True)
+
+    with torch.no_grad():
+        logits = model(inputs.input_values,
+                       attention_mask=inputs.attention_mask).logits
+
+    predicted_ids = torch.argmax(logits, dim=-1)
+    predicted_sentences = processor.batch_decode(predicted_ids)[0]
+    print("YOUR SENTENCE IS: ", predicted_sentences)
+    
+    return sd_create_from_text(text=predicted_sentences, save_path=save_path, user_id=user_id)
 
 
 def sd_create_from_picture(pic_path: str, save_path: str, user_id) -> str:

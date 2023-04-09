@@ -1,4 +1,3 @@
-from utils.texts import *
 import logging
 import os
 
@@ -17,11 +16,11 @@ from telegram.ext import (
     ConversationHandler,
 )
 # , sd_create_from_text
-from AI_Backend.Diffusers.diffuser_model import sd_create_from_picture, sd_create_from_text
-
+from AI_Backend.Diffusers.diffuser_model import sd_create_from_picture, sd_create_from_text, sound_preproccessing
+from utils.texts import *
+from utils.token import API_TOKEN
 PATH = Path('C:\Codes\AI-telegram-bot')
 
-API_TOKEN = '5467893531:AAGtHVvPbMEuT6fOVUuSjZeGT7AzV8QWWes'
 
 CREATING = 1
 
@@ -62,7 +61,7 @@ class BotHandler:
     async def help_command(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         """Help command from handler"""
 
-        update.message.reply_text(help_text)
+        await update.message.reply_text(help_text)
 
     async def end_command(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         """End command from handler"""
@@ -84,8 +83,8 @@ class BotHandler:
             f"{file_name}.jpg")
         path = PATH / 'Data' / 'temporary_files' / f'{file_name}.jpg'
 
-        new_file = await context.bot.get_file(update.message.photo[-1].file_id)
-        await new_file.download_to_drive(custom_path=path)
+        user_picture = await context.bot.get_file(update.message.photo[-1].file_id)
+        await user_picture.download_to_drive(custom_path=path)
 
         picture_path = PATH / 'Data' / 'generated_files'
         if not os.path.exists(picture_path):
@@ -97,12 +96,13 @@ class BotHandler:
             text="I get it successful! Wait pls!")
         await update.message.reply_photo(save_path)
 
-        return ConversationHandler.END
+        return CREATING
 
     async def text_to_picture(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         user_text = update.message.text
         picture_path = PATH / 'Data' / 'generated_files'
+        
         if not os.path.exists(picture_path):
             os.makedirs(picture_path)
         save_path = sd_create_from_text(text=user_text,
@@ -112,7 +112,27 @@ class BotHandler:
             text="Wait pls!")
         await update.message.reply_photo(save_path)
 
-        return ConversationHandler.END
+        return CREATING
+
+    async def voice_to_picture(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+        voice_path = PATH / 'Data' / 'temporary_files' / \
+            f'{update.message.from_user.id}_voice.mp3'
+        file_id = update.message.voice.file_id
+        user_voice = await context.bot.get_file(file_id)
+        await user_voice.download_to_drive(custom_path=voice_path)
+        
+        picture_path = PATH / 'Data' / 'generated_files'
+        if not os.path.exists(picture_path):
+            os.makedirs(picture_path)
+        save_path = sound_preproccessing(sound_path=voice_path,
+                                         save_path=picture_path, user_id=update.message.from_user.id)
+        await context.bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text="Wait pls!")
+        await update.message.reply_photo(save_path)
+
+        return CREATING
 
 
 def main() -> None:
@@ -130,10 +150,10 @@ def main() -> None:
         states={
             CREATING: [MessageHandler(filters.TEXT, Bot.text_to_picture),
                        MessageHandler(filters.PHOTO, Bot.picture_to_picture),
-                       #MessageHandler(filters.VOICE, Bot.voice_to_picture)
+                       MessageHandler(filters.VOICE, Bot.voice_to_picture)
                        ],
         },
-        fallbacks=[]
+        fallbacks=[CommandHandler('finish', Bot.stop_command)]
     )
     app.add_handler(create_handler)
 
