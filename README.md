@@ -8,9 +8,15 @@ Instructions for use:
 
 1. /start
 
+![Voice-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/start_cmd.bmp)
+
 2. /help - If you want to see all instructions for creating pictures
 
+![Voice-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/help_cmd.bmp)
+
 3. /create - Using this command, the bot will wait for you to provide one of the input data options for generating images
+
+![Voice-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/create_cmd.bmp)
 
 4. /finish - Finish creating regime
 
@@ -19,15 +25,21 @@ Instructions for use:
 
 1. Photo-to-photo
 
+![Photo-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/photo_to_photo.bmp)
+
 2. Text-to-photo
+
+![Text-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/text_to_photo.bmp)
 
 3. Voice-to-photo
 
+Voice message: "rainbow behind blue cat:
+
+![Voice-to-photo](https://github.com/akon1te/AI-telegram-bot/examples/voice_to_photo.bmp)
 
 rainbow behind blue cat
 
 ### Used tools and models
-
  - Python Telegram Bot
  - Torch
  - Torchvision
