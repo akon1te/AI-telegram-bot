@@ -5,8 +5,14 @@ no_pics = (
     f"You didnt load any pictures!"
 )
 
+create_paths = (
+    f"Choose how you want to create a photo.\n Can be photo -> photo, text -> photo, audio -> photoо"
+)
+
 help_text = (
-    f"Write me something and I will try to answer your question or complete your task"
+    "For generating pictures using Stable diffusion do this step by step:\n \
+    Use command /create and after that write your text, send picture or voice message. (English language, pls!!!)\n \
+    For every new picture you should write /create."   
 )
 
 end_text = (
