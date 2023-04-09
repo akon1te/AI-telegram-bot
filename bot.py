@@ -15,10 +15,10 @@ from telegram.ext import (
     MessageHandler,
     ConversationHandler,
 )
-# , sd_create_from_text
-from AI_Backend.Diffusers.diffuser_model import sd_create_from_picture, sd_create_from_text, sound_preproccessing
-from utils.texts import *
-from utils.token import API_TOKEN
+ 
+from src.AI_Backend.Diffusers.diffuser_model import sd_create_from_picture, sd_create_from_text, sound_preproccessing
+from src.utils.texts import *
+from src.utils.token import API_TOKEN
 PATH = Path('C:\Codes\AI-telegram-bot')
 
 
@@ -85,15 +85,16 @@ class BotHandler:
 
         user_picture = await context.bot.get_file(update.message.photo[-1].file_id)
         await user_picture.download_to_drive(custom_path=path)
-
+        await context.bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text="I get it successful! Wait pls!")
+        
         picture_path = PATH / 'Data' / 'generated_files'
         if not os.path.exists(picture_path):
             os.makedirs(picture_path)
         save_path = sd_create_from_picture(pic_path=path,
                                            save_path=picture_path, user_id=update.message.from_user.id)
-        await context.bot.sendMessage(
-            chat_id=update.message.chat_id,
-            text="I get it successful! Wait pls!")
+        
         await update.message.reply_photo(save_path)
 
         return CREATING
@@ -102,6 +103,10 @@ class BotHandler:
 
         user_text = update.message.text
         picture_path = PATH / 'Data' / 'generated_files'
+        
+        await context.bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text="I get it successful! Wait pls!")
         
         if not os.path.exists(picture_path):
             os.makedirs(picture_path)
@@ -122,14 +127,16 @@ class BotHandler:
         user_voice = await context.bot.get_file(file_id)
         await user_voice.download_to_drive(custom_path=voice_path)
         
+        await context.bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text="I get it successful! Wait pls!")
+        
         picture_path = PATH / 'Data' / 'generated_files'
         if not os.path.exists(picture_path):
             os.makedirs(picture_path)
         save_path = sound_preproccessing(sound_path=voice_path,
                                          save_path=picture_path, user_id=update.message.from_user.id)
-        await context.bot.sendMessage(
-            chat_id=update.message.chat_id,
-            text="Wait pls!")
+
         await update.message.reply_photo(save_path)
 
         return CREATING

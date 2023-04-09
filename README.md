@@ -1,71 +1,44 @@
 # AI-telegram-bot
 
-AI Bot telegram
+AI-telegram-bot
 
-```
-docker cp utt.mp3 ID_CONTAINER:/root
-```
-Или можно сделать проще, просто примонтировать само аудио, только назовите его "utt.mp3":
+A bot that will generate an image at your request using stable-diffusion-v1.5 
 
-```
-docker run -it -v <your path>/utt.mp3:/utt.mp3 stt_image:ver1
-```
+Instructions for use:
 
-Если просто хотите проверить работоспособность, то запустите образ stt_image:
+1. /start
 
-![Скрин1](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic1.png)
+2. /help - If you want to see all instructions for creating pictures
 
-Оригинальный текст в аудио отрывке: "I love you, Phoebe".
+3. /create - Using this command, the bot will wait for you to provide one of the input data options for generating images
+
+4. /finish - Finish creating regime
 
 
-### Критерии:
+### Examples
 
-- Наличие Dockerfile - 2 балла **[есть](https://github.com/Laitielly/labs_docker/blob/main/lab1/Dockerfile.txt)** (+ [файл с загружаемыми библиотеками](https://github.com/Laitielly/labs_docker/blob/main/lab1/requirements.txt) )
+1. Photo-to-photo
 
-- Верное описание Dockerfile - 4 балла **есть**
+2. Text-to-photo
 
-Докер файл содержит:
-  
-    - ос - ubuntu:22.04
-    - нужные библиотеки для: сохранения/восстановления сеансов (libsm6), 
-    работы с аудио/видео файлами (так как работаем с аудио) (ffmpeg), 
-    графического интерфейса (libxext6), работы со строками, списками (libglib2.0-0)
-    - установка python3
-    - установка pip
-    - копирование нужных для работы файлов (open_mer - модель, requirements.txt - нужные модули для работы с моделью stt, 
-    utt.mp3 - аудиозапись)
-    - установка библиотек из requirements.txt
-    - запуск модели open_mer/main.py
-  
-- Создание Docker-контейнера - 2 балла **есть**
-
-Вот переименование контейнера (создание было с запуском образа):
-
-![Скрин3](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic3.png)
-
-- Запуск приложения в Docker-контейнере - 2 балла **есть**
-
-Контейнер называется stt_container. Здесь я как раз поменяла запись внутри контейнера и запустила файл из него:
-
-![Скрин2](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic2.png)
+3. Voice-to-photo
 
 
-- Проверка работоспособности приложения - 10 баллов (10 за полностью работоспособное приложение, 5 за приложение с некоторыми недоступными функциями, 0 за неработоспособное приложение) **есть, работает полностью, скрины приложены выше**
+rainbow behind blue cat
 
-Скачать образ можно [здесь](https://disk.yandex.ru/d/G27xZUDfXxwvfA). Вот еще картиночки к подтверждению:
+### Used tools and models
 
-![Скрин4](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic4.png)
-![Скрин5](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic5.png)
+ - Python Telegram Bot
+ - Torch
+ - Torchvision
+ - Librosa
+All models that were used were taken from HuggingFace:
+ - transformers
+(https://huggingface.co/jonatasgrosman/wav2vec2-large-xlsr-53-english)
 
-У контейнера image python_env:ver3, потому что я переименовала образ чуть позже:
-![Скрин6](https://github.com/Laitielly/labs_docker/blob/main/images_docker/pic6.png)
+ - diffusers
+(https://huggingface.co/runwayml/stable-diffusion-v1-5)
+(https://huggingface.co/lambdalabs/sd-image-variations-diffusers)
 
 
-- Качество кода и комментариев - 2 балла **надеюсь есть**
 
-Комментарии вы видите выше, а сам код - [lab1](https://github.com/Laitielly/labs_docker/tree/main/lab1), [open_mer](https://github.com/Laitielly/labs_docker/tree/main/lab1/open_mer).
-
-### Что не получалось:
-
-- Хотела оптимизировать и поставить алпайн питон, но проблемы с установкой модулей. Поэтому для удобной работы с файлами заюзала убунту.
-- Сначала думала как лучше примаунтить аудио и просто копировала его в локалхост, но потом исправила на монтирование из любой папки.
