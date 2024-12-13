@@ -1,0 +1,10 @@
+classifier_model:
+  model_name: "facebook/bart-large-mnli"
+  message_types: 
+    - "Подарок"
+    - "Желание"
+
+generation_model:
+  model_name: "MTSAIR/Cotype-Nano"
+  system_prompt: "Ты — ИИ-помощник. Тебе дано задание: необходимо сгенерировать подробный и развернутый ответ."
+  max_new_tokens: 256
