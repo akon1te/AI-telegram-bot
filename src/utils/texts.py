@@ -1,3 +1,4 @@
+
 def get_start_text(name: str) -> str:
     return (f"Hello, {name}!\nI'm AI Painter bot! I can create picture for you!")
 

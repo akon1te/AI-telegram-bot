@@ -14,3 +14,6 @@ __pycache__/
 *$py.class
 
 .ipynb_checkpoints
+
+*tmp*
+todo

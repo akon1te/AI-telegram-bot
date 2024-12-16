@@ -3,8 +3,6 @@ import os
 import yaml
 from pathlib import Path
 
-import numpy as np
-
 from telegram import (
     ReplyKeyboardRemove,
     Update,
@@ -44,7 +42,7 @@ class BotHandler:
     
     async def create_user_info(self, user) -> None:
         self.__users_files[user.id]['full_name'] = user.full_name
-        self.__users_files[user.id]['conversation'] = []
+        self.__users_files[user.id]['conversation'] = []    
         
     async def update_conversation(self, user, updated_conversation) -> None:
         self.__users_files[user.id]['conversation'] = (updated_conversation)
@@ -69,6 +67,7 @@ class BotHandler:
             del self.__users_files[update.message.from_user.id]
 
         await update.message.reply_text(end_text)
+
 
     async def process_user_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_message = update.message.text.lower()

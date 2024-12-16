@@ -1,0 +1,4 @@
+1. Refactoring bot for conversation 
+2. Investigate lib/models for chatbots
+3. Write list of possible features
+4. Refactor ai_backend 
