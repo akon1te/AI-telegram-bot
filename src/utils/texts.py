@@ -1,21 +1,15 @@
 
-def get_start_text(name: str) -> str:
-    return (f"Hello, {name}!\nI'm AI Painter bot! I can create picture for you!")
+def get_start_text() -> str:
+    return (f"Привет!\n Я бот для генерации пожеланий и подарков на новый год!")
 
-no_pics = (
-    f"You didnt load any pictures!"
-)
-
-create_paths = (
-    f"Choose how you want to create a photo.\n Can be photo -> photo, text -> photo, audio -> photo"
+generate_text = (
+    "К сожалению меня запустили на очкошной ГПУ (или CPU) и мне надо время потупить и подумать :("
 )
 
 help_text = (
-    "For generating pictures using Stable diffusion do this step by step:\n \
-    Use command /create and after that write your text, send picture or voice message. (English language, pls!!!)\n \
-    If you want to finish, send me /finish command."   
+    "Попроси у меня что-то сгенерировать введя текст с запросом."   
 )
 
 end_text = (
-    f"Goodbye!)"
+    f"Пока!)"
 )

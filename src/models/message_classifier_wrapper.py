@@ -1,5 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 
 
 class BartMessageClassifier:

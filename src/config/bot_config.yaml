@@ -6,5 +6,6 @@ classifier_model:
 
 generation_model:
   model_name: "MTSAIR/Cotype-Nano"
-  system_prompt: "Ты — ИИ-помощник. Тебе дано задание: необходимо сгенерировать подробный и развернутый ответ."
-  max_new_tokens: 256
+  generation_params:
+    max_new_tokens: 256
+  device: "cuda"
