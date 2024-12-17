@@ -17,6 +17,7 @@ from telegram.ext import (
 )
 
 from models.inference import ModelInference
+from models.generate_picture_wrapper import sd_create_from_text
  
 from utils.texts import *
 from utils.token import API_TOKEN
@@ -70,18 +71,29 @@ class BotHandler:
 
         await update.message.reply_text(generate_text)
         
-        response_text, new_conversation =  self.model_inference.inference(
-            user_message, 
-            self.__users_files[user.id]['conversation'],
-            task_type='generate'
-        )
-                
-        await context.bot.sendMessage(
-            chat_id=update.message.chat_id,
-            text=response_text,
+        message_class = self.model_inference.inference(
+            user_message,
+            None,
+            task_type='cls'
         )
         
-        await self.update_conversation(user, new_conversation)
+        if message_class == 0: #text
+            await update.message.reply_text(generate_text)
+    
+            response_text, new_conversation = self.model_inference.inference(
+                user_message, 
+                self.__users_files[user.id]['conversation'],
+                task_type='generate'
+            )
+            await context.bot.sendMessage(
+                chat_id=update.message.chat_id,
+                text=response_text,
+            )
+            await self.update_conversation(user, new_conversation)
+            
+        elif message_class == 1: #image
+            image_path = sd_create_from_text(user_message, user.id)
+            await update.message.reply_photo(image_path)
             
         return Action.WAIT_MESSAGE
     
