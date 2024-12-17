@@ -1,11 +1,5 @@
-classifier_model:
-  model_name: "facebook/bart-large-mnli"
-  message_types: 
-    - "Подарок"
-    - "Желание"
-
 generation_model:
   model_name: "MTSAIR/Cotype-Nano"
   generation_params:
-    max_new_tokens: 256
-  device: "cuda"
+    max_new_tokens: 512
+  device: "mps"

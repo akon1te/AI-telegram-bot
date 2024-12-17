@@ -8,11 +8,13 @@ class GenearationModelWrapper:
         self.device = model_config['device']
         if self.device == 'cuda' and not torch.cuda.is_available():
             self.device = 'cpu'
+        if self.device == 'mps' and not torch.backends.mps.is_available():
+            self.device = 'cpu'
         print('Model inference device: ', self.device)  
          
         self.generation_config = model_config['generation_params']
         self.model_name = model_config['model_name']
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_name).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         
 
