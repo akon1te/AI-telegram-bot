@@ -7,4 +7,4 @@ generation_model:
   model_name: "MTSAIR/Cotype-Nano"
   generation_params:
     max_new_tokens: 128
-  device: "cpu"
+  device: "mps"

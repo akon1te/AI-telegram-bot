@@ -4,6 +4,10 @@ import yaml
 from pathlib import Path
 
 from telegram import (
+    KeyboardButton,
+    KeyboardButtonPollType,
+    Poll,
+    ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
     Update,
 )
@@ -17,20 +21,26 @@ from telegram.ext import (
 )
 
 from models.inference import ModelInference
-from models.generate_picture_wrapper import sd_create_from_text
  
 from utils.texts import *
 from utils.token import API_TOKEN
 
-from utils.utils import Action
+from utils.utils import (
+    Action, 
+    TASK_SWITCH_TO_IMG_KEYBOARD,
+    TASK_SWITCH_TO_TEXT_KEYBOARD, 
+    TASK_TYPE_KEYBOARD,
+)
     
-
-#PATH = Path('C:\Codes\AI-telegram-bot')
-
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
 logger = logging.getLogger(__name__)
+
+
+task_type_markup = ReplyKeyboardMarkup(TASK_TYPE_KEYBOARD, one_time_keyboard=True)
+task_switch_to_img_markup = ReplyKeyboardMarkup(TASK_SWITCH_TO_IMG_KEYBOARD, one_time_keyboard=True)
+task_switch_to_text_markup = ReplyKeyboardMarkup(TASK_SWITCH_TO_TEXT_KEYBOARD, one_time_keyboard=True)
 
 
 class BotHandler:
@@ -49,53 +59,71 @@ class BotHandler:
         
     async def update_conversation(self, user, updated_conversation) -> None:
         self.__users_files[user.id]['conversation'] = updated_conversation.copy()
-
-    async def stop_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-        """Start command from handler"""
-        return ConversationHandler.END
     
     async def start_command(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         """Help command from handler"""
-        await update.message.reply_text(get_start_text(), reply_markup=ReplyKeyboardRemove())
+        user = update.message.from_user
+        if user.id not in self.__users_files.keys():
+            await self.__create_user_info(user)
+            
+        await update.message.reply_text(get_start_text(), reply_markup=task_type_markup)
+        return Action.WAIT_MESSAGE
 
     async def help_command(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
         """Help command from handler"""
         await update.message.reply_text(help_text)
+        
+    async def stop_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Start command from handler"""
+        return ConversationHandler.END
+        
+    async def text_task_type(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Help command from handler"""
+        print('SWITCHING TO TEXT TASK TYPE')
+        await update.message.reply_text(task_type_choosing['text'])
+        return Action.TEXT_GENERATION
 
-    async def process_user_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    async def img_task_type(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Help command from handler"""
+        print('SWITCHING TO IMAGE TASK TYPE')
+        await update.message.reply_text(task_type_choosing['img'])
+        return Action.IMG_GENERATION
+        
+    async def switch_task_type(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        """Help command from handler"""
+        await update.message.reply_text(switch_task_type_text, reply_markup=task_type_markup)
+        return Action.WAIT_MESSAGE
+
+
+    async def text_task_processing(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_message = update.message.text.lower()
-        
         user = update.message.from_user
-        if user.id not in self.__users_files.keys():
-            await self.__create_user_info(user)
 
-        await update.message.reply_text(generate_text)
+        await update.message.reply_text(generate_response_text)
         
-        message_class = self.model_inference.inference(
-            user_message,
-            None,
-            task_type='cls'
+        response_text, new_conversation =  self.model_inference.inference(
+            user_message, 
+            self.__users_files[user.id]['conversation'],
+            task_type='generate_text'
+        )
+                
+        await context.bot.sendMessage(
+            chat_id=update.message.chat_id,
+            text=response_text,
+            reply_markup=task_switch_to_img_markup
         )
         
-        if message_class == 0: #text
-            await update.message.reply_text(generate_text)
+        await self.update_conversation(user, new_conversation)
+            
+        return Action.TEXT_GENERATION
     
-            response_text, new_conversation = self.model_inference.inference(
-                user_message, 
-                self.__users_files[user.id]['conversation'],
-                task_type='generate'
-            )
-            await context.bot.sendMessage(
-                chat_id=update.message.chat_id,
-                text=response_text,
-            )
-            await self.update_conversation(user, new_conversation)
+    async def image_task_processing(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        user_message = update.message.text.lower()
+        user = update.message.from_user
+
+        await update.message.reply_text(generate_img_text, reply_markup=task_switch_to_text_markup)
             
-        elif message_class == 1: #image
-            image_path = sd_create_from_text(user_message, user.id)
-            await update.message.reply_photo(image_path)
-            
-        return Action.WAIT_MESSAGE
+        return Action.IMG_GENERATION
     
 
 def start_bot(config_path) -> None:
@@ -104,14 +132,41 @@ def start_bot(config_path) -> None:
     Bot = BotHandler(config_path)
     
     app.add_handler(CommandHandler('help', Bot.help_command))
-    app.add_handler(CommandHandler('start', Bot.start_command))
 
     create_handler = ConversationHandler(
         entry_points=[
-            MessageHandler(filters.TEXT, Bot.process_user_message)
+            CommandHandler("start", Bot.start_command)
         ],
         states={
-            Action.WAIT_MESSAGE: [MessageHandler(filters.TEXT, Bot.process_user_message)],
+            Action.WAIT_MESSAGE: [
+                MessageHandler(
+                    filters.Regex("^Режим диалога$"), 
+                    Bot.text_task_type
+                ),
+                MessageHandler(
+                    filters.Regex("^Режим генерации картинок$"), 
+                    Bot.img_task_type
+                ),
+                MessageHandler(filters.TEXT, Bot.text_task_processing)
+            ],
+            
+            Action.IMG_GENERATION: [
+                MessageHandler(
+                    filters.Regex("^Режим диалога$"),  
+                    Bot.text_task_type
+                ),
+                MessageHandler(filters.TEXT, Bot.image_task_processing),
+                CommandHandler('switch', Bot.switch_task_type),
+            ],
+            
+            Action.TEXT_GENERATION: [
+                MessageHandler(
+                    filters.Regex("^Режим генерации картинок$"), 
+                    Bot.img_task_type
+                ),
+                MessageHandler(filters.TEXT, Bot.text_task_processing),
+                CommandHandler('switch', Bot.switch_task_type),
+            ],
         },
         fallbacks=[
             #TODO:fallbacks
