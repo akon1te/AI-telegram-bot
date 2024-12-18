@@ -1,7 +1,9 @@
-classification_model:
-  model_name: "facebook/bart-large-mnli"
-  classes: ['текст', 'картинка, изображение, нарисуй']
-  device: "mps"
+image_model:
+  model_name: "stabilityai/stable-diffusion-xl-base-1.0"
+  generation_params:
+    width: 240
+    height: 240
+  device: "cpu"
 
 generation_model:
   model_name: "MTSAIR/Cotype-Nano"

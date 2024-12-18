@@ -120,6 +120,12 @@ class BotHandler:
     async def image_task_processing(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         user_message = update.message.text.lower()
         user = update.message.from_user
+        
+        image_path =  self.model_inference.inference(
+            user_message, 
+            None,
+            task_type='generate_image'
+        )
 
         await update.message.reply_text(generate_img_text, reply_markup=task_switch_to_text_markup)
             
