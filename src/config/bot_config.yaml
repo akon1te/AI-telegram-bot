@@ -1,8 +1,7 @@
 image_model:
-  model_name: "stabilityai/stable-diffusion-xl-base-1.0"
+  model_name: "runwayml/stable-diffusion-v1-5"
   generation_params:
-    width: 240
-    height: 240
+    num_inference_steps: 20
   device: "cpu"
 
 generation_model:

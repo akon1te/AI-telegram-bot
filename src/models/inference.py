@@ -17,6 +17,6 @@ class ModelInference:
             return responce, conversation
         elif task_type == 'generate_picture':
             print("GENERATE IMAGE STARTED")
-            image_path = self.sd_wrapper(message)
-            return image_path
+            image = self.sd_wrapper(message)
+            return image
 

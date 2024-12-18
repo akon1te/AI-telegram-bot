@@ -121,13 +121,19 @@ class BotHandler:
         user_message = update.message.text.lower()
         user = update.message.from_user
         
-        image_path =  self.model_inference.inference(
+        image =  self.model_inference.inference(
             user_message, 
             None,
             task_type='generate_image'
         )
-
-        await update.message.reply_text(generate_img_text, reply_markup=task_switch_to_text_markup)
+        
+        image_path = os.path.join(Path(__file__).parent.absolute(), 'tmp_images', f"{user.user_id}.jpg")
+        image['images'][0].save(image_path)
+         
+        await context.bot.send_photo(
+            chat_id=update.message.chat_id,
+            photo=open(image_path, 'rb')
+        )
             
         return Action.IMG_GENERATION
     
