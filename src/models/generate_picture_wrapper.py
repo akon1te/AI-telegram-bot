@@ -27,7 +27,8 @@ class ImageGenerationWrapper:
         
     def __call__(self, input_message: str) -> tuple[str, list]:
         translate_input_message = self.translate_pipeline(input_message)[0]['translation_text']
-    
+        print("TRANSLATE MSG: ", translate_input_message)
+        
         self.sd_pipeline = self.sd_pipeline.to(self.device)
         image = self.sd_pipeline(translate_input_message, num_inference_steps=self.generation_config['num_inference_steps']).images[0]
         self.sd_pipeline = self.sd_pipeline.to('cpu')
