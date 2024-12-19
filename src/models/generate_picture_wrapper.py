@@ -1,4 +1,5 @@
 from diffusers import DiffusionPipeline
+from transformers import pipeline
 import torch 
 
 from diffusers import StableDiffusionImageVariationPipeline, StableDiffusionPipeline
@@ -15,15 +16,21 @@ class ImageGenerationWrapper:
          
         self.generation_config = model_config['generation_params']
         self.model_name = model_config['model_name']
-        self.pipeline = StableDiffusionPipeline.from_pretrained(
+        self.sd_pipeline = StableDiffusionPipeline.from_pretrained(
             self.model_name, 
             torch_dtype=torch.float16, 
         )
         
+        self.translate_model_name = model_config['translate_model_name']
+        self.translate_pipeline = pipeline("translation", model=self.translate_model_name)
+        
+        
     def __call__(self, input_message: str) -> tuple[str, list]:
-        sd_pipeline = sd_pipeline.to(self.device)
-        image = self.pipeline(input_message, num_inference_steps=5, height=160, width=160).images[0]
-        sd_pipeline = sd_pipeline.to('cpu')
+        translate_input_message = self.translate_pipeline(input_message)[0]['translation_text']
+    
+        self.sd_pipeline = self.sd_pipeline.to(self.device)
+        image = self.sd_pipeline(translate_input_message, num_inference_steps=self.generation_config['num_inference_steps']).images[0]
+        self.sd_pipeline = self.sd_pipeline.to('cpu')
         return image
     
 

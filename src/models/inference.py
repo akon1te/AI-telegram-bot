@@ -7,7 +7,7 @@ class ModelInference:
         self.config = config
         if 'generation_model' in self.config:
             self.qwen_wrapper = GenearationModelWrapper(self.config['generation_model']) 
-        if 'sd_model' in self.config:
+        if 'image_model' in self.config:
             self.sd_wrapper = ImageGenerationWrapper(self.config['image_model'])  
 
     def inference(self, message, user_conversation_history, task_type):

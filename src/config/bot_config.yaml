@@ -1,11 +1,12 @@
 image_model:
   model_name: "runwayml/stable-diffusion-v1-5"
+  translate_model_name: "Helsinki-NLP/opus-mt-ru-en"
   generation_params:
-    num_inference_steps: 20
-  device: "cpu"
+    num_inference_steps: 50
+  device: "cuda"
 
 generation_model:
   model_name: "MTSAIR/Cotype-Nano"
   generation_params:
     max_new_tokens: 128
-  device: "mps"
+  device: "cpu"
