@@ -1,20 +1,19 @@
-#IDE file
 .idea
 .fleet
 .vscode
+.venv
 
-#Bot configs and other additional files
 config.py
 *_exmpl.py
 temporary_files
 generated_files
 token.py
 
-
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Jupyter Notebook
 .ipynb_checkpoints
+
+*tmp*
+todo

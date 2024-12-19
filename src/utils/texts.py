@@ -1,20 +1,27 @@
-def get_start_text(name: str) -> str:
-    return (f"Hello, {name}!\nI'm AI Painter bot! I can create picture for you!")
+def get_start_text() -> str:
+    return (f"Привет!\n Я бот для генерации пожеланий и подарков на новый год!")
 
-no_pics = (
-    f"You didnt load any pictures!"
+generate_response_text = (
+    "К сожалению меня запустили на слабенькой ГПУ (или CPU) и мне надо время потупить и подумать :("
 )
 
-create_paths = (
-    f"Choose how you want to create a photo.\n Can be photo -> photo, text -> photo, audio -> photo"
+generate_img_text = (
+    "К сожалению меня запустили на слабенькой ГПУ (или CPU) и мне надо время, чтобы нарисовать что-то близкое к адекватному :("
 )
 
 help_text = (
-    "For generating pictures using Stable diffusion do this step by step:\n \
-    Use command /create and after that write your text, send picture or voice message. (English language, pls!!!)\n \
-    If you want to finish, send me /finish command."   
+    "Попроси у меня что-то сгенерировать введя текст с запросом. Если ты хочешь, чтобы я генерировал картинку, то лучше уточни это "   
 )
 
+switch_task_type_text = (
+    "Возвращаемся к выбору режима!"
+)
+
+task_type_choosing = {
+    "text": "Режим диалога выбран: моежете писать любой запрос, но не ожидайте фантастических ответов, я очень маленький (всего 1B)",
+    "img": "Режим генерации картинок выбран: лучше формируйте свой запрос как \'Игрушечный заяц рядом с зеленой елкой на которой висят свечки\'"
+}
+
 end_text = (
-    f"Goodbye!)"
+    f"Пока!)"
 )
